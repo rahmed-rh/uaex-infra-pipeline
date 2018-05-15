@@ -87,20 +87,24 @@ openshift.withCluster() {
    //openshift.replace("--force", "-f ", cm.data['amq-image-stream'])
    //}
 
-
+   echo "Creating/updating FIS ImageStream"
    openshift.replace("--force", "-f ", cm.data['fis-image-stream'])
 
+   echo "Creating/updating AMQ ImageStream & Template"
    openshift.replace("--force", "-f ", cm.data['amq-image-stream'])
    amqTemplate = openshift.replace("--force", "-f ", cm.data['amq-template'])
-
+ 
+   echo "Creating/updating JDG ImageStream & Template"
    openshift.replace("--force", "-f ", cm.data['jdg-image-stream'])
    jdgTemplate = openshift.replace("--force", "-f ", cm.data['jdg-template'])
 
+   echo "Creating/updating DecisionServer ImageStream & Template"
    openshift.replace("--force", "-f ", cm.data['decisionserver-image-stream'])
    openshift.replace("--force", "-f ", cm.data['decisionserver-template'])
 
-
-   amqModels = openshift.process("amq63-persistent", "-p APPLICATION_NAME=${cm.data['amq-app-name']} ", "-p AMQ_STORAGE_USAGE_LIMIT=5gb", "-p MQ_USERNAME=admin", "-p MQ_PASSWORD=passw0rd", "-p MQ_QUEUES=TESTQUEUE")
+   echo "Processing AMQ Template"
+   amqModels = openshift.process("amq63-persistent", "-p APPLICATION_NAME=${cm.data['amq-app-name']} ", "-p AMQ_STORAGE_USAGE_LIMIT=5Gi", "-p MQ_USERNAME=admin", "-p MQ_PASSWORD=passw0rd", "-p MQ_QUEUES=TESTQUEUE")
+   echo "Processing JDG Template"
    jdgModels = openshift.process("datagrid71-basic", "-p APPLICATION_NAME=${cm.data['jdg-app-name']}", "-p INFINISPAN_CONNECTORS=hotrod,rest", "-p HOTROD_AUTHENTICATION=true", "-p CACHE_NAMES=default,payees", "-p USERNAME=admin", "-p PASSWORD=redhat1!")
   }
 
@@ -113,12 +117,12 @@ openshift.withCluster() {
      openshift.create('serviceaccount', 'amq-service-account')
      openshift.policy("add-role-to-user", "view", "system:serviceaccount:$PROJECT_NAME:amq-service-account", "-n", PROJECT_NAME)
     }
-    objects = openshift.create(amqModels, "-l app=${cm.data['amq-app-name']}")
+    openshift.create(amqModels, "-l app=${cm.data['amq-app-name']}")
 
    }
 
    stage('Create JDG Dev Env') {
-    objects = openshift.create(jdgModels, "-l app=${cm.data['jdg-app-name']}")
+    openshift.create(jdgModels, "-l app=${cm.data['jdg-app-name']}")
 
    }
 
