@@ -18,7 +18,7 @@ openshift.withCluster() {
    def JDG_APP_NAME = "uaex-jdg-data"
    def DECISIONSERVER_IMAGE_STREAM = "https://raw.githubusercontent.com/jboss-openshift/application-templates/master/decisionserver/decisionserver64-image-stream.json"
    def DECISIONSERVER_TEMPLATE = "https://raw.githubusercontent.com/jboss-openshift/application-templates/master/decisionserver/decisionserver64-basic-s2i.json"
-   
+
 
    echo "Hello from project ${openshift.project()} in cluster ${openshift.cluster()}"
 
@@ -29,33 +29,33 @@ openshift.withCluster() {
     def cmExists = cmSelector.exists()
 
     if (cmExists) {
-     cm = cmSelector.object()
-    } else {
-     def cmappconfig = [
-      [
-       "kind": "ConfigMap",
-       "apiVersion": "v1",
-       "metadata": [
-        "name": "pipeline-app-config"
-       ],
-       "data": [
-        "fis-1-app-git-url": "${FIS_1_GIT_URL}",
-        "fis-2-app-git-url": "${FIS_2_GIT_URL}",
-        "fis-image-stream": "${FIS_IMAGE_STREAM}",
-        "amq-image-stream": "${AMQ_IMAGE_STREAM}",
-        "amq-template": "${AMQ_TEMPLATE}",
-        "amq-app-name": "${AMQ_APP_NAME}",
-        "jdg-template": "${JDG_TEMPLATE}",
-        "jdg-image-stream": "${JDG_IMAGE_STREAM}",
-        "jdg-app-name": "${JDG_APP_NAME}",
-        "decisionserver-template": "${DECISIONSERVER_TEMPLATE}",
-        "decisionserver-image-stream": "${DECISIONSERVER_IMAGE_STREAM}"
-       ]
+     cm = cmSelector.delete()
+    }
+    def cmappconfig = [
+     [
+      "kind": "ConfigMap",
+      "apiVersion": "v1",
+      "metadata": [
+       "name": "pipeline-app-config"
+      ],
+      "data": [
+       "fis-1-app-git-url": "${FIS_1_GIT_URL}",
+       "fis-2-app-git-url": "${FIS_2_GIT_URL}",
+       "fis-image-stream": "${FIS_IMAGE_STREAM}",
+       "amq-image-stream": "${AMQ_IMAGE_STREAM}",
+       "amq-template": "${AMQ_TEMPLATE}",
+       "amq-app-name": "${AMQ_APP_NAME}",
+       "jdg-template": "${JDG_TEMPLATE}",
+       "jdg-image-stream": "${JDG_IMAGE_STREAM}",
+       "jdg-app-name": "${JDG_APP_NAME}",
+       "decisionserver-template": "${DECISIONSERVER_TEMPLATE}",
+       "decisionserver-image-stream": "${DECISIONSERVER_IMAGE_STREAM}"
       ]
      ]
-     cm = openshift.create(cmappconfig).object()
+    ]
+    cm = openshift.create(cmappconfig).object()
 
-    }
+
     echo "The CM is ${cm}"
     echo "The fis-1-app-git-url is ${cm.data['fis-1-app-git-url']}"
     echo "The fis-2-app-git-url is ${cm.data['fis-2-app-git-url']}"
@@ -95,10 +95,10 @@ openshift.withCluster() {
 
    openshift.replace("--force", "-f ", cm.data['jdg-image-stream'])
    jdgTemplate = openshift.replace("--force", "-f ", cm.data['jdg-template'])
-   
+
    openshift.replace("--force", "-f ", cm.data['decisionserver-image-stream'])
    openshift.replace("--force", "-f ", cm.data['decisionserver-template'])
-   
+
 
    amqModels = openshift.process("amq63-persistent", "-p APPLICATION_NAME=${cm.data['amq-app-name']} ", "-p AMQ_STORAGE_USAGE_LIMIT=5gb", "-p MQ_USERNAME=admin", "-p MQ_PASSWORD=passw0rd", "-p MQ_QUEUES=TESTQUEUE")
    jdgModels = openshift.process("datagrid71-basic", "-p APPLICATION_NAME=${cm.data['jdg-app-name']}", "-e INFINISPAN_CONNECTORS=hotrod,rest", "-e HOTROD_AUTHENTICATION=true", "-e CACHE_NAMES=default,payees", "-e USERNAME=admin", "-e PASSWORD=redhat1!")
@@ -113,12 +113,12 @@ openshift.withCluster() {
      openshift.create('serviceaccount', 'amq-service-account')
      openshift.policy("add-role-to-user", "view", "system:serviceaccount:$PROJECT_NAME:amq-service-account", "-n", PROJECT_NAME)
     }
-    objects = openshift.create(amqModels,"-l app=${cm.data['amq-app-name']}")
+    objects = openshift.create(amqModels, "-l app=${cm.data['amq-app-name']}")
 
    }
-   
+
    stage('Create JDG Dev Env') {
-    objects = openshift.create(jdgModels,"-l app=${cm.data['jdg-app-name']}")
+    objects = openshift.create(jdgModels, "-l app=${cm.data['jdg-app-name']}")
 
    }
 
