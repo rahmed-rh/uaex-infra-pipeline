@@ -103,13 +103,13 @@ openshift.withCluster() {
    openshift.replace("--force", "-f ", cm.data['decisionserver-template'])
 
    echo "Processing AMQ Template"
-   amqModels = openshift.process("amq63-persistent", "-p APPLICATION_NAME=${cm.data['amq-app-name']} ", "-p AMQ_STORAGE_USAGE_LIMIT=5Gi", "-p MQ_USERNAME=admin", "-p MQ_PASSWORD=passw0rd", "-p MQ_QUEUES=TESTQUEUE")
+   amqModels = openshift.process("amq63-persistent", "-p APPLICATION_NAME=${cm.data['amq-app-name']} ", "-p AMQ_STORAGE_USAGE_LIMIT=5gb", "-p MQ_USERNAME=admin", "-p MQ_PASSWORD=passw0rd", "-p MQ_QUEUES=TESTQUEUE")
    echo "Processing JDG Template"
    jdgModels = openshift.process("datagrid71-basic", "-p APPLICATION_NAME=${cm.data['jdg-app-name']}", "-p INFINISPAN_CONNECTORS=hotrod,rest", "-p HOTROD_AUTHENTICATION=true", "-p CACHE_NAMES=default,payees", "-p USERNAME=admin", "-p PASSWORD=redhat1!")
   }
 
   openshift.withProject(PROJECT_NAME) {
-   stage('Create AMQ Dev Env') {
+   stage('Preparing AMQ Dev Env') {
     //create amq servie account
     def amqSASelector = openshift.selector("serviceaccount", "amq-service-account")
     def amqSAExists = amqSASelector.exists()
@@ -117,12 +117,17 @@ openshift.withCluster() {
      openshift.create('serviceaccount', 'amq-service-account')
      openshift.policy("add-role-to-user", "view", "system:serviceaccount:$PROJECT_NAME:amq-service-account", "-n", PROJECT_NAME)
     }
-    openshift.create(amqModels)
+    echo "Deleting OLD AMQ Env if exist"
+    openshift.selector( 'all', [ application: cm.data['amq-app-name'] ] ).delete()
+    openshift.selector( 'pvc', [ application: cm.data['amq-app-name'] ] ).delete()
+    
+    echo "Create New AMQ Env -- fresh"
+    objects = openshift.create(amqModels)
 
    }
 
-   stage('Create JDG Dev Env') {
-    openshift.create(jdgModels)
+   stage('Preparing JDG Dev Env') {
+    objects = openshift.create(jdgModels)
 
    }
 
