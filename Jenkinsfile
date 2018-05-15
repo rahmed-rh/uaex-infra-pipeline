@@ -122,7 +122,7 @@ openshift.withCluster() {
    }
 
    stage('Create JDG Dev Env') {
-    openshift.create(jdgModels, "-l app=${cm.data['jdg-app-name']}")
+    openshift.create(jdgModels)
 
    }
 
