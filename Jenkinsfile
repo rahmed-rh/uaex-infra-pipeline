@@ -117,7 +117,7 @@ openshift.withCluster() {
      openshift.create('serviceaccount', 'amq-service-account')
      openshift.policy("add-role-to-user", "view", "system:serviceaccount:$PROJECT_NAME:amq-service-account", "-n", PROJECT_NAME)
     }
-    openshift.create(amqModels, "-l app=${cm.data['amq-app-name']}")
+    openshift.create(amqModels)
 
    }
 
