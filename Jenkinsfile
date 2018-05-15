@@ -127,6 +127,12 @@ openshift.withCluster() {
    }
 
    stage('Preparing JDG Dev Env') {
+   
+    echo "Deleting OLD JDG Env if exist"
+    openshift.selector( 'all', [ application: cm.data['jdg-app-name'] ] ).delete()
+    openshift.selector( 'pvc', [ application: cm.data['jdg-app-name'] ] ).delete()
+    
+    echo "Create New jdg Env -- fresh"
     objects = openshift.create(jdgModels)
 
    }
