@@ -113,12 +113,12 @@ openshift.withCluster() {
      openshift.create('serviceaccount', 'amq-service-account')
      openshift.policy("add-role-to-user", "view", "system:serviceaccount:$PROJECT_NAME:amq-service-account", "-n", PROJECT_NAME)
     }
-    objects = openshift.create(amqModels)
+    objects = openshift.create(amqModels,"-l app=${cm.data['amq-app-name']}")
 
    }
    
    stage('Create JDG Dev Env') {
-    objects = openshift.create(jdgModels)
+    objects = openshift.create(jdgModels,"-l app=${cm.data['jdg-app-name']}")
 
    }
 
