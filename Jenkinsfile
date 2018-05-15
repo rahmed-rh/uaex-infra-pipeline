@@ -101,7 +101,7 @@ openshift.withCluster() {
 
 
    amqModels = openshift.process("amq63-persistent", "-p APPLICATION_NAME=${cm.data['amq-app-name']} ", "-p AMQ_STORAGE_USAGE_LIMIT=5gb", "-p MQ_USERNAME=admin", "-p MQ_PASSWORD=passw0rd", "-p MQ_QUEUES=TESTQUEUE")
-   jdgModels = openshift.process("datagrid71-basic", "-p APPLICATION_NAME=${cm.data['jdg-app-name']}", "-e INFINISPAN_CONNECTORS=hotrod,rest", "-e HOTROD_AUTHENTICATION=true", "-e CACHE_NAMES=default,payees", "-e USERNAME=admin", "-e PASSWORD=redhat1!")
+   jdgModels = openshift.process("datagrid71-basic", "-p APPLICATION_NAME=${cm.data['jdg-app-name']}", "-p INFINISPAN_CONNECTORS=hotrod,rest", "-p HOTROD_AUTHENTICATION=true", "-p CACHE_NAMES=default,payees", "-p USERNAME=admin", "-p PASSWORD=redhat1!")
   }
 
   openshift.withProject(PROJECT_NAME) {
