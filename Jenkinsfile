@@ -8,7 +8,9 @@ openshift.withCluster() {
   def cm
   openshift.withProject(PROJECT_NAME) {
    def FIS_1_GIT_URL = "https://github.com/rahmed-rh/uaex-fis-1"
+   def FIS_1_APP_NAME = "uaex-fis-1"
    def FIS_2_GIT_URL = "https://github.com/rahmed-rh/uaex-fis-2"
+   def FIS_2_APP_NAME = "uaex-fis-2"
    def FIS_IMAGE_STREAM = "https://raw.githubusercontent.com/jboss-fuse/application-templates/GA/fis-image-streams.json"
    def AMQ_IMAGE_STREAM = "https://raw.githubusercontent.com/jboss-openshift/application-templates/master/amq/amq63-image-stream.json"
    def AMQ_TEMPLATE = "https://raw.githubusercontent.com/jboss-openshift/application-templates/master/amq/amq63-persistent.json"
@@ -40,7 +42,9 @@ openshift.withCluster() {
       ],
       "data": [
        "fis-1-app-git-url": "${FIS_1_GIT_URL}",
+       "fis-1-app-name": "${FIS_1_APP_NAME}",
        "fis-2-app-git-url": "${FIS_2_GIT_URL}",
+       "fis-2-app-name": "${FIS_2_APP_NAME}",
        "fis-image-stream": "${FIS_IMAGE_STREAM}",
        "amq-image-stream": "${AMQ_IMAGE_STREAM}",
        "amq-template": "${AMQ_TEMPLATE}",
