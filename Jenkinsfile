@@ -1,6 +1,6 @@
 openshift.withCluster() {
  openshift.withCredentials('cluster-admin-credential-id') {
-  def PROJECT_NAME = "poc"
+  def PROJECT_NAME = "ocplearning-project"
   def amqTemplate
   def amqModels
   def jdgModels
